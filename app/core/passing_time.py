@@ -39,17 +39,17 @@ def signal_controller_cycle(
 ):
 
     vehicle_counts = intersections  # Directly using passed vehicle counts
-    print(f"Detected vehicles: {vehicle_counts}")
+    logging.info(f"Detected vehicles: {vehicle_counts}")
 
     gst = calculate_green_signal_time(vehicle_counts, num_lanes, average_times)
-    print(f"Signal is GREEN for {gst} seconds.")
+    logging.info(f"Signal is GREEN for {gst} seconds.")
 
     # Simulate green signal
 
     # Yellow signal for 3 seconds
-    print("Signal is YELLOW for 3 seconds.")
+    logging.info("Signal is YELLOW for 3 seconds.")
 
     # Red signal by default when not green or yellow
-    print("Signal is RED.\n")
+    logging.info("Signal is RED.\n")
 
     return gst  # Return the green signal time for further processing if needed
