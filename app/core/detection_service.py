@@ -1,18 +1,65 @@
-import tensorflow as tf
 import numpy as np
 import cv2
+from ultralytics import YOLO
+from collections import Counter
+
 
 class DetectionService:
     def __init__(self, model_path):
-        self.model = tf.keras.models.load_model(model_path)
+        try:
+            self.model = YOLO(model_path)
+            print("Model loaded successfully!")
+        except Exception as e:
+            print(f"Error loading the model: {e}")
+            self.model = None
 
     def detect_cars(self, image):
-        # Preprocess the image
-        image_resized = cv2.resize(image, (224, 224))  # Example size
-        image_normalized = image_resized / 255.0
-        image_batch = np.expand_dims(image_normalized, axis=0)
+        if self.model is None:
+            print("Model is not loaded. Cannot perform detection.")
+            return None
 
-        # Predict car presence
-        predictions = self.model.predict(image_batch)
-        car_count = int(np.sum(predictions > 0.5))  # Example threshold
-        return car_count
+        try:
+            # Resize image to 640x640 as YOLO expects
+            image_resized = cv2.resize(image, (640, 640))
+
+            # Run inference directly on (H, W, C) image
+            results = self.model.predict(
+                source=image_resized, save=False, verbose=False
+            )
+
+            print("Model inference completed!")
+
+            # Get detections
+            detections = results[0].boxes.cls.cpu().numpy()
+
+            # Map class indices to names
+            names = self.model.model.names
+
+            # Define vehicle-related classes
+            vehicle_classes = {
+                "car",
+                "bus",
+                "motorbike",
+                "pickup",
+                "suv",
+                "taxi",
+                "truck",
+                "van",
+            }
+
+            # Count occurrences of vehicle classes
+            counts = Counter()
+            for class_id in detections:
+                label = names[int(class_id)]
+                if label in vehicle_classes:
+                    counts[label] += 1
+
+            print("\nDetected vehicle counts:")
+            for vehicle, count in counts.items():
+                print(f"{vehicle}: {count}")
+
+            return counts
+
+        except Exception as e:
+            print(f"Error during detection: {e}")
+            return None
