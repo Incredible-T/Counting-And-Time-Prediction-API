@@ -9,3 +9,4 @@ python-dotenv
 scikit-learn
 ultralytics
 python-multipart
+firebase-admin
