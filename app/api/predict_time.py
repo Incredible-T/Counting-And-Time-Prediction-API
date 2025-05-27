@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from app.core.detection_service import DetectionService
 from app.core.passing_time import signal_controller_cycle
+from config.firebase_store import store_data
 
 
 router = APIRouter()
@@ -47,6 +48,16 @@ async def predict_time(file: UploadFile):
 
         # call signal_controller_cycle
         pass_time = signal_controller_cycle(car_count_json_safe)
+
+        # Store the data in Firebase
+        store_data(
+            "traffic_data",
+            file.filename,
+            {
+                "car_count": car_count_json_safe,
+                "estimated_passing_time_seconds": pass_time,
+            },
+        )
 
         return {
             "car_count": car_count_json_safe,
