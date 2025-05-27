@@ -1,4 +1,4 @@
-import time
+import logging
 
 # Average passing times per vehicle class (customized by region/intersection)
 average_times = {
