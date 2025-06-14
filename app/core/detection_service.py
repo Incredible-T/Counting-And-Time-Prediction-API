@@ -1,20 +1,18 @@
 import cv2
 from ultralytics import YOLO
 from collections import Counter
+import logging
 
 
 class DetectionService:
     def __init__(self, model_path):
-        try:
-            self.model = YOLO(model_path)
-            print("Model loaded successfully!")
-        except Exception as e:
-            print(f"Error loading the model: {e}")
-            self.model = None
+        self.model_path = model_path
+        self.model = None
+        logging.info(f"Initializing DetectionService with model path: {model_path}")
 
     def detect_cars(self, image):
         if self.model is None:
-            print("Model is not loaded. Cannot perform detection.")
+            logging.error("Model is not loaded. Cannot perform detection.")
             return None
 
         try:
@@ -26,7 +24,7 @@ class DetectionService:
                 source=image_resized, save=False, verbose=False
             )
 
-            print("Model inference completed!")
+            logging.info("Model inference completed!")
 
             # Get detections
             detections = results[0].boxes.cls.cpu().numpy()
@@ -53,12 +51,12 @@ class DetectionService:
                 if label in vehicle_classes:
                     counts[label] += 1
 
-            print("\nDetected vehicle counts:")
+            logging.info("\nDetected vehicle counts:")
             for vehicle, count in counts.items():
-                print(f"{vehicle}: {count}")
+                logging.info(f"{vehicle}: {count}")
 
             return counts
 
         except Exception as e:
-            print(f"Error during detection: {e}")
+            logging.error(f"Error during detection: {e}")
             return None
