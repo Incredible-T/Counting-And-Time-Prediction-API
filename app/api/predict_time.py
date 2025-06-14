@@ -5,6 +5,7 @@ import numpy as np
 from app.core.detection_service import DetectionService
 from app.core.passing_time import signal_controller_cycle
 from config.firebase_store import store_data
+import datetime
 
 
 router = APIRouter()
@@ -42,7 +43,8 @@ async def predict_time(file: UploadFile):
 
         # Detect cars
         car_count = detection_service.detect_cars(image)
-
+        if car_count is None:
+            raise HTTPException(status_code=500, detail="Failed to detect vehicles in the image.")
         # Convert Counter keys to strings or ints
         car_count_json_safe = dict(car_count)
 
@@ -56,6 +58,7 @@ async def predict_time(file: UploadFile):
             {
                 "car_count": car_count_json_safe,
                 "estimated_passing_time_seconds": pass_time,
+                "created_date": datetime.datetime.now().isoformat(),
             },
         )
 
