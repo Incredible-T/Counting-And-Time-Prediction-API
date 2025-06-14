@@ -6,8 +6,7 @@ import logging
 
 class DetectionService:
     def __init__(self, model_path):
-        self.model_path = model_path
-        self.model = None
+        self.model = YOLO(model_path)
         logging.info(f"Initializing DetectionService with model path: {model_path}")
 
     def detect_cars(self, image):
