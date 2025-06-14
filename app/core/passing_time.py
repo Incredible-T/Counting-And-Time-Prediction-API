@@ -39,6 +39,9 @@ def signal_controller_cycle(
 ):
 
     vehicle_counts = intersections  # Directly using passed vehicle counts
+    if not vehicle_counts:
+        logging.warning("No vehicle counts provided.")
+        return 0  # or a default value
     logging.info(f"Detected vehicles: {vehicle_counts}")
 
     gst = calculate_green_signal_time(vehicle_counts, num_lanes, average_times)
