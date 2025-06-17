@@ -7,6 +7,8 @@ from app.core.passing_time import signal_controller_cycle
 from config.firebase_store import store_data
 import datetime
 
+# import random
+
 
 router = APIRouter()
 
@@ -44,27 +46,41 @@ async def predict_time(file: UploadFile):
         # Detect cars
         car_count = detection_service.detect_cars(image)
         if car_count is None:
-            raise HTTPException(status_code=500, detail="Failed to detect vehicles in the image.")
+            raise HTTPException(
+                status_code=500, detail="Failed to detect vehicles in the image."
+            )
         # Convert Counter keys to strings or ints
         car_count_json_safe = dict(car_count)
 
         # call signal_controller_cycle
-        pass_time = signal_controller_cycle(car_count_json_safe)
+        pass_time = round(signal_controller_cycle(car_count_json_safe))
+
+        # Generate random vehicle counts for comparison
+        # random_car_count = {key: random.randint(0, 10) for key in car_count.keys()}
+
+        # # Compare the generated random values with the detected car counts
+        # logger.info(f"Generated random car count: {random_car_count}")
+        # logger.info(f"Detected car count: {car_count_json_safe}")
+
+        # # Update green time if the random car count is greater
+        # if sum(random_car_count.values()) > sum(car_count_json_safe.values()):
+        #     logger.info("Random car count is greater. Updating green time.")
+        #     pass_time += pass_time * (1/3)
 
         # Store the data in Firebase
         store_data(
             "traffic_data",
             file.filename,
             {
-                "car_count": car_count_json_safe,
-                "estimated_passing_time_seconds": pass_time,
+                "vehicle_count_per_type": car_count_json_safe,
+                "green_time": pass_time,
                 "created_date": datetime.datetime.now().isoformat(),
             },
         )
 
         return {
-            "car_count": car_count_json_safe,
-            "estimated_passing_time_seconds": pass_time,
+            "vehicle_count_per_type": car_count_json_safe,
+            "green_time": pass_time,
         }
 
     except ValueError as ve:
