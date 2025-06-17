@@ -4,7 +4,7 @@ import json
 import logging
 
 # Load the service account key from the JSON file
-with open("/etc/secrets/traffic-data.json", "r") as key_file:
+with open(".env/traffic-data.json", "r") as key_file:
     service_account_key = json.load(key_file)
 
 # Initialize Firebase Admin SDK
