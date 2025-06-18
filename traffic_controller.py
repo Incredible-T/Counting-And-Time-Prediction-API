@@ -90,23 +90,23 @@ class TrafficController:
         """Request green time from prediction server"""
         logging.info(f"Requesting green time for {direction.upper()}")
 
-        # if not self.capture_image():
-        #     return DEFAULT_GREEN_TIME
+        if not self.capture_image():
+            return DEFAULT_GREEN_TIME
 
         try:
             # Use the pre-captured image for the current direction
-            image_path = DIRECTION_IMAGES[direction]
+            # image_path = DIRECTION_IMAGES[direction]
 
             # Read the image file
-            with open(image_path, "rb") as image_file:
+            with open(PHOTO_PATH, "rb") as image_file:
                 files = {
                     "file": (
-                        os.path.basename(image_path),
+                        os.path.basename(PHOTO_PATH),
                         image_file,
                         "image/jpeg",
                     )
                 }
-                logging.info(f"Sending request to {SERVER_URL} with image {image_path}")
+                logging.info(f"Sending request to {SERVER_URL} with image {PHOTO_PATH}")
                 response = requests.post(
                     SERVER_URL,
                     files=files,
